@@ -4,32 +4,32 @@ const BASE_URL =
 const axiosInstance = axios.create({ baseURL: BASE_URL });
 
 //Student
-const getAllYears = () => axiosInstance.get("/year");
-const createStudent = (data) => axiosInstance.post("/students", data);
-const getAllStudent = () => axiosInstance.get("/students");
-const deleteStudent = (id) => axiosInstance.delete("/students?id=" + id);
+const getAllYears = () => axiosInstance.get("/api/year");
+const createStudent = (data) => axiosInstance.post("/api/students", data);
+const getAllStudent = () => axiosInstance.get("/api/students");
+const deleteStudent = (id) => axiosInstance.delete("/api/students?id=" + id);
 
 //Attendance
 const getAttendanceList = (year, month) =>
-  axiosInstance.get("/attendance?year=" + year + "&month=" + month);
+  axiosInstance.get("/api/attendance?year=" + year + "&month=" + month);
 
-const markAttendance = (data) => axiosInstance.post("/attendance", data);
+const markAttendance = (data) => axiosInstance.post("/api/attendance", data);
 
 const deleteAttendanceRecord = ({ Rollno, date, day }) =>
-  axiosInstance.delete("/attendance", {
+  axiosInstance.delete("/api/attendance", {
     params: { Rollno, date, day },
   });
 
 //Login & Roles
 const getUserRole = async (email, password) => {
   try {
-    const response = await axiosInstance.get("/login", {
+    const response = await axiosInstance.get("/api/login", {
       params: { email, password },
     });
-    if (response.data && response.data.length > 0) {
-      return response.data[0].role;
+    if (response.data.role) {
+      return response.data.role;
     } else {
-      console.error("Invalid credentials or no role found.");
+      console.error("No role found.");
       return null;
     }
   } catch (error) {
