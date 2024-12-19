@@ -1,41 +1,48 @@
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-// This function can be marked `async` if using `await` inside
-// export async function middleware(request) {
-//   const { isAuthenticated } = getKindeServerSession();
-
-//   if (!(await isAuthenticated())) {
-//     return NextResponse.redirect(
-//       new URL("/api/auth/login?post_login_redirect_url=/dashboard", request.url)
-//     );
-//   }
-// }
-
-// // See "Matching Paths" below to learn more
-// export const config = {
-//   matcher: "/dashboard/:path*",
-// };
-
 import { NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
+import { jwtVerify } from "jose";
+
+const SECRET_KEY = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export async function middleware(request) {
-  // const token = request.cookies.get("token");
-  // if (!token) {
-  //   return NextResponse.redirect(process.env.NEXT_PUBLIC_LOGIN_URL);
-  // }
-
+  const token = request.cookies.get("auth_token")?.value || null;
   const pathname = request.nextUrl.pathname;
-
-  if (pathname.startsWith("/dashboard")) {
-    return NextResponse.next(); // Allow access to the dashboard
+  if (!token) {
+    return NextResponse.redirect(process.env.NEXT_PUBLIC_LOGIN_URL);
+  }
+  try {
+    const { payload } = await jwtVerify(token, SECRET_KEY);
+    console.log("Decoded Token:", payload);
+    //const decoded = jwt.verify(token, SECRET_KEY);
+    if (pathname.startsWith("/dashboard") && payload.role === "teacher") {
+      return NextResponse.next();
+    }
+    if (
+      pathname.startsWith("/student-dashboard") &&
+      payload.role === "student"
+    ) {
+      return NextResponse.next();
+    }
+    return NextResponse.redirect(process.env.NEXT_PUBLIC_LOGIN_URL);
+  } catch (error) {
+    console.log("Invalid Token", error);
+    return NextResponse.redirect(process.env.NEXT_PUBLIC_LOGIN_URL);
   }
 
-  if (pathname.startsWith("/student-dashboard")) {
-    return NextResponse.next(); // Allow access to the student dashboard
-  }
-
-  return NextResponse.redirect(process.env.NEXT_PUBLIC_LOGIN_URL);
+  //return NextResponse.next();
 }
 
 export const config = {
   matcher: ["/dashboard/:path*", "/student-dashboard/:path*"],
 };
+
+// const protectedRoutes = ["/dashboard", "/student-dashboard"];
+// if (protectedRoutes.some((route) => pathname.startsWith(route))) {
+//   if (!token) {
+//     return NextResponse.redirect(process.env.NEXT_PUBLIC_LOGIN_URL);
+//   }
+//   try {
+
+//     return NextResponse.next();
+//   }
+// }
