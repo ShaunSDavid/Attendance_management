@@ -12,10 +12,11 @@ function LoginPage() {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    console.log(email, password);
+    setLoading(true);
 
     try {
       const role = await GlobalApi.getUserRole(email, password);
+      console.log(role);
       if (role === "teacher") {
         router.push(process.env.NEXT_PUBLIC_DASHBOARD_URL); // Redirect teacher
       } else if (role === "student") {
@@ -25,6 +26,8 @@ function LoginPage() {
       }
     } catch (error) {
       console.error("Error fetching user role:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
