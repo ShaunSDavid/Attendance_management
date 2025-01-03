@@ -15,18 +15,6 @@ function SideNav() {
       icon: LayoutIcon,
       path: "/student-dashboard",
     },
-    {
-      id: 2,
-      name: "Attendance",
-      icon: Hand,
-      path: "/student-dashboard/attendance",
-    },
-    {
-      id: 3,
-      name: "Settings",
-      icon: Settings,
-      path: "/student-dashboard/settings",
-    },
   ];
 
   const path = usePathname();
