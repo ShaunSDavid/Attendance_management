@@ -37,6 +37,7 @@ export const Teachers = pgTable("teachers", {
 export const Students = pgTable("students", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 50 }).notNull(),
+  email: varchar("email", { length: 100 }).notNull(),
   year: varchar("year", { length: 20 }).notNull(),
   regno: varchar("regno", { length: 15 }).notNull(),
   rollno: varchar("rollno", { length: 15 }).notNull(),
