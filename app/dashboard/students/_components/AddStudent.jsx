@@ -66,6 +66,13 @@ function AddStudent({ refreshData }) {
                     {...register("name", { required: true })}
                   />
                 </div>
+                <div className="py-2">
+                  <label>Email</label>
+                  <Input
+                    placeholder="Eg johndoe@gmail.com"
+                    {...register("email", { required: true })}
+                  />
+                </div>
                 <div className="flex flex-col py-2 ">
                   <label>Select Year</label>
                   <select
