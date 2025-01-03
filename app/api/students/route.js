@@ -8,6 +8,7 @@ export async function POST(req, resp) {
 
   const result = await db.insert(Students).values({
     name: data?.name,
+    email: data?.email,
     year: data?.year,
     regno: data?.regno,
     rollno: data?.rollno,
