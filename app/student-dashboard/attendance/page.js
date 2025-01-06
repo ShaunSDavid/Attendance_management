@@ -6,13 +6,33 @@ import { Button } from "@/components/ui/button";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import AttendanceGrid from "./_components/AttendanceGrid";
+import jwtDecode from "jwt-decode";
 
 function Attendance() {
   const [selectedMonth, setSelectedMonth] = useState();
   const [selectedYear, setSelectedYear] = useState();
   const [attendanceList, setAttendanceList] = useState([]);
-
+  const [email, setEmail] = useState("");
   // Logic for gettting data for a specified month and year
+
+  useEffect(() => {
+    const token = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("auth_token="))
+      ?.split("=")[1];
+
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        console.log("Decoded Token:", decoded);
+        setEmail(decoded.email);
+      } catch (error) {
+        console.error("Invalid token:", error);
+      }
+    } else {
+      console.error("Auth token not found.");
+    }
+  }, []);
 
   useEffect(() => {
     if (!selectedYear) {
@@ -28,9 +48,11 @@ function Attendance() {
 
   const searchHandler = () => {
     const month = moment(selectedMonth).format("MM/YYYY");
-    GlobalApi.getAttendanceList(selectedYear, month).then((resp) => {
-      setAttendanceList(resp.data);
-    });
+    GlobalApi.getStudentAttendanceList(selectedYear, month, email).then(
+      (resp) => {
+        setAttendanceList(resp.data);
+      }
+    );
   };
 
   return (

@@ -3,18 +3,26 @@
 import { GraduationCap, Hand, LayoutIcon, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import React, { useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 
 function SideNav() {
   //   const { user } = useKindeBrowserClient();
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
   const menuList = [
     {
       id: 1,
-      name: "Student-DashBoard",
+      name: "Dashboard",
       icon: LayoutIcon,
-      path: "/student-dashboard",
+      path: "/student-dashboard/attendance",
     },
+    // {
+    //   id: 2,
+    //   name: "Attendance",
+    //   icon: Hand,
+    //   path: "/student-dashboard/attendance",
+    // },
   ];
 
   const path = usePathname();
@@ -43,6 +51,17 @@ function SideNav() {
           </h2>
         </Link>
       ))}
+
+      <div className="flex gap-1.5 bottom-5 items-center fixed">
+        <button
+          type="submit"
+          className="block mx-auto w-40 h-14 bg-white border-primary border-2 text-primary hover:bg-primary hover:text-white py-2 px-4 rounded-lg transition duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed"
+          disabled={loading}
+          onClick={() => router.push(process.env.NEXT_PUBLIC_LOGIN_URL)}
+        >
+          {loading ? "Logging out..." : "Logout"}
+        </button>
+      </div>
       {/* <div className="flex gap-1.5 bottom-5 items-center fixed">
         <Image
           src={user?.picture}
