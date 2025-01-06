@@ -13,6 +13,12 @@ const deleteStudent = (id) => axiosInstance.delete("/api/students?id=" + id);
 const getAttendanceList = (year, month) =>
   axiosInstance.get("/api/attendance?year=" + year + "&month=" + month);
 
+//Attendance for a Student
+const getStudentAttendanceList = (year, month, email) =>
+  axiosInstance.get(
+    "/api/attendance?year=" + year + "&month=" + month + "&email=" + email
+  );
+
 const markAttendance = (data) => axiosInstance.post("/api/attendance", data);
 
 const deleteAttendanceRecord = ({ Rollno, date, day }) =>
@@ -44,6 +50,7 @@ export default {
   getAllStudent,
   deleteStudent,
   getAttendanceList,
+  getStudentAttendanceList,
   markAttendance,
   deleteAttendanceRecord,
   getUserRole,
