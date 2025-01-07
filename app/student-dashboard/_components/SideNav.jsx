@@ -27,6 +27,13 @@ function SideNav() {
 
   const path = usePathname();
   useEffect(() => console.log(path), [path]);
+  const handlelogout = () => {
+    setLoading(true);
+    document.cookie =
+      "auth_token=;path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    router.push(process.env.NEXT_PUBLIC_LOGIN_URL);
+    setLoading(false);
+  };
   return (
     <div className="border shadow-md h-screen p-4">
       <Image
@@ -57,7 +64,7 @@ function SideNav() {
           type="submit"
           className="block mx-auto w-40 h-14 bg-white border-primary border-2 text-primary hover:bg-primary hover:text-white py-2 px-4 rounded-lg transition duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed"
           disabled={loading}
-          onClick={() => router.push(process.env.NEXT_PUBLIC_LOGIN_URL)}
+          onClick={handlelogout}
         >
           {loading ? "Logging out..." : "Logout"}
         </button>
