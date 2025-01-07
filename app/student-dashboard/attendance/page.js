@@ -24,8 +24,12 @@ function Attendance() {
     if (token) {
       try {
         const decoded = jwtDecode(token);
-        console.log("Decoded Token:", decoded);
-        setEmail(decoded.email);
+        if (decoded.email) {
+          setEmail(decoded.email);
+          searchHandler();
+        } else {
+          console.error("Email not found in token.");
+        }
       } catch (error) {
         console.error("Invalid token:", error);
       }
@@ -36,7 +40,7 @@ function Attendance() {
 
   useEffect(() => {
     if (!selectedYear) {
-      setSelectedYear("2021-2025");
+      setSelectedYear("21-25 CSE");
     }
   }, []);
 

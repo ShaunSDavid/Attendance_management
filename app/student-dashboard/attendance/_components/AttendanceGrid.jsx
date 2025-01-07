@@ -33,9 +33,7 @@ function AttendanceGrid({ attendanceList, selectedMonth, selectedYear }) {
   };
 
   const isDayEditable = (day) => {
-    const today = moment();
-    const cellDate = moment(selectedMonth).date(day);
-    return cellDate.isSameOrAfter(today, "day");
+    return false;
   };
 
   const deleteFalseRecords = () => {
@@ -177,7 +175,7 @@ function AttendanceGrid({ attendanceList, selectedMonth, selectedYear }) {
       <input
         type="checkbox"
         checked={props.value}
-        disabled={dayEditable}
+        disabled={!dayEditable}
         onChange={(e) => {
           if (dayEditable) {
             props.node.setDataValue(props.colDef.field, e.target.checked);
