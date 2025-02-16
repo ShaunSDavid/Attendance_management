@@ -13,6 +13,7 @@ function Attendance() {
   const [selectedYear, setSelectedYear] = useState();
   const [attendanceList, setAttendanceList] = useState([]);
   const [email, setEmail] = useState("");
+  const [studentList, setstudentList] = useState([]);
   // Logic for gettting data for a specified month and year
 
   useEffect(() => {
@@ -42,13 +43,13 @@ function Attendance() {
     if (!selectedYear) {
       setSelectedYear("21-25 CSE");
     }
-  }, []);
+  }, [email]);
 
   useEffect(() => {
-    if (selectedYear) {
+    if (email && selectedYear) {
       searchHandler();
     }
-  }, [selectedYear]);
+  }, [email, selectedYear]);
 
   const searchHandler = () => {
     const month = moment(selectedMonth).format("MM/YYYY");
@@ -57,6 +58,9 @@ function Attendance() {
         setAttendanceList(resp.data);
       }
     );
+    GlobalApi.getAllStudent().then((resp) => {
+      setstudentList(resp.data);
+    });
   };
 
   return (
@@ -79,6 +83,8 @@ function Attendance() {
         attendanceList={attendanceList}
         selectedMonth={selectedMonth}
         selectedYear={selectedYear}
+        studentList={studentList}
+        selectedemail={email}
       />
     </div>
   );
