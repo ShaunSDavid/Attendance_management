@@ -11,7 +11,7 @@ function Attendance() {
   const [selectedMonth, setSelectedMonth] = useState();
   const [selectedYear, setSelectedYear] = useState();
   const [attendanceList, setAttendanceList] = useState([]);
-
+  const [studentList, setstudentList] = useState([]);
   // Logic for gettting data for a specified month and year
 
   useEffect(() => {
@@ -30,6 +30,9 @@ function Attendance() {
     const month = moment(selectedMonth).format("MM/YYYY");
     GlobalApi.getAttendanceList(selectedYear, month).then((resp) => {
       setAttendanceList(resp.data);
+    });
+    GlobalApi.getAllStudent().then((resp) => {
+      setstudentList(resp.data);
     });
   };
 
@@ -53,6 +56,7 @@ function Attendance() {
         attendanceList={attendanceList}
         selectedMonth={selectedMonth}
         selectedYear={selectedYear}
+        studentList={studentList}
       />
     </div>
   );

@@ -6,7 +6,12 @@ import moment from "moment";
 import GlobalApi from "@/app/services/GlobalApi";
 import { toast } from "sonner";
 
-function AttendanceGrid({ attendanceList, selectedMonth, selectedYear }) {
+function AttendanceGrid({
+  attendanceList,
+  selectedMonth,
+  selectedYear,
+  studentList,
+}) {
   const [rowData, setRowData] = useState([]);
   const [colDef, setColDef] = useState([]);
 
@@ -38,31 +43,147 @@ function AttendanceGrid({ attendanceList, selectedMonth, selectedYear }) {
     return cellDate.isSameOrAfter(today, "day");
   };
 
-  const deleteFalseRecords = () => {
-    attendanceList.forEach((record) => {
-      const isFalse =
-        record.absent1 == false &&
-        record.absent2 == false &&
-        record.absent3 == false;
+  // const deleteFalseRecords = () => {
+  //   attendanceList.forEach((record) => {
+  //     const isFalse =
+  //       record.absent1 == false &&
+  //       record.absent2 == false &&
+  //       record.absent3 == false;
 
-      if (isFalse) {
-        GlobalApi.deleteAttendanceRecord({
-          Rollno: record.Rollno,
-          date: record.date,
-          day: record.day,
-        })
-          .then((resp) => {
-            console.log(`Record for Rollno ${record.Rollno} deleted`, resp);
-          })
-          .catch((err) => {
-            console.error(
-              `Failed to delete record for Rollno ${record.Rollno}`,
-              err
-            );
-          });
-      }
-    });
-  };
+  //     if (isFalse) {
+  //       GlobalApi.deleteAttendanceRecord({
+  //         Rollno: record.Rollno,
+  //         date: record.date,
+  //         day: record.day,
+  //       })
+  //         .then((resp) => {
+  //           console.log(`Record for Rollno ${record.Rollno} deleted`, resp);
+  //         })
+  //         .catch((err) => {
+  //           console.error(
+  //             `Failed to delete record for Rollno ${record.Rollno}`,
+  //             err
+  //           );
+  //         });
+  //     }
+  //   });
+  // };
+
+  // useEffect(() => {
+  //   if (attendanceList) {
+  //     const filteredList = attendanceList.filter(
+  //       (record) => record.year === selectedYear
+  //     );
+  //     const userList = getUniqueRecord(filteredList);
+
+  //     if (userList.length === 0) {
+  //       // If there are no students for this month, initialize rowData with placeholders
+  //       setRowData([]);
+  //     } else {
+  //       const semesterStart = moment().year() + "-01-01"; // Adjust to actual semester start date
+  //       const today = moment();
+  //       const totalDays = today.diff(moment(semesterStart), "days") + 1;
+  //       const totalHours = totalDays * 3; // Since each day has 3 sections
+
+  //       userList.forEach((student) => {
+  //         let absentCount = 0;
+  //         dayArray.forEach((date) => {
+  //           if (isAbsent1(student.Rollno, date)) absentCount++;
+  //           if (isAbsent2(student.Rollno, date)) absentCount++;
+  //           if (isAbsent3(student.Rollno, date)) absentCount++;
+  //         });
+
+  //         student.absentHours = absentCount;
+  //         student.presentHours = totalHours - absentCount;
+  //         student.attendancePercentage = (
+  //           (student.presentHours / totalHours) *
+  //           100
+  //         ).toFixed(2);
+  //       });
+  //       setRowData(userList);
+  //     }
+  //     const summaryColumns = [
+  //       {
+  //         headerName: "Total Hours",
+  //         field: "totalHours",
+  //         valueGetter: () => totalHours,
+  //         width: 120,
+  //       },
+  //       { headerName: "Present Hours", field: "presentHours", width: 120 },
+  //       {
+  //         headerName: "Attendance (%)",
+  //         field: "attendancePercentage",
+  //         width: 120,
+  //       },
+  //     ];
+
+  //     const DayColumns = dayArray.flatMap((date) => {
+  //       const dayEditable = isDayEditable(date);
+  //       return {
+  //         headerName: `${getDayWithSuffix(date)} ${moment(selectedMonth).format(
+  //           "MMM"
+  //         )}`,
+  //         marryChildren: true,
+  //         children: [
+  //           {
+  //             headerName: `Morning`,
+  //             field: `day${date}-1`,
+  //             editable: dayEditable,
+  //             cellRenderer: CheckboxRenderer,
+  //             cellStyle: (params) => ({
+  //               textAlign: "center",
+  //             }),
+  //             width: 100,
+  //             cellRendererParams: { dayEditable },
+  //           },
+  //           {
+  //             headerName: `Midday`,
+  //             field: `day${date}-2`,
+  //             editable: dayEditable,
+  //             cellRenderer: CheckboxRenderer,
+  //             cellStyle: (params) => ({
+  //               textAlign: "center",
+  //             }),
+  //             width: 100,
+  //             cellRendererParams: { dayEditable },
+  //           },
+  //           {
+  //             headerName: `Afternoon`,
+  //             field: `day${date}-3`,
+  //             editable: dayEditable,
+  //             cellRenderer: CheckboxRenderer,
+  //             cellStyle: (params) => ({
+  //               textAlign: "center",
+  //             }),
+  //             width: 100,
+  //             cellRendererParams: { dayEditable },
+  //           },
+  //         ],
+  //       };
+  //     });
+
+  //     // Used for checking if the student is present or not
+  //     dayArray.forEach((date) => {
+  //       userList.forEach((obj) => {
+  //         obj[`day${date}-1`] = isAbsent1(obj.Rollno, date) || false;
+  //         obj[`day${date}-2`] = isAbsent2(obj.Rollno, date) || false;
+  //         obj[`day${date}-3`] = isAbsent3(obj.Rollno, date) || false;
+  //       });
+  //     });
+
+  //     setColDef(() => [
+  //       {
+  //         field: "Rollno",
+  //         pinned: "left",
+  //       },
+  //       { field: "name", pinned: "left" },
+  //       ...summaryColumns,
+  //       ...DayColumns,
+  //     ]);
+  //     //deleteFalseRecords();
+  //     // setRowData(userList);
+  //   }
+  // }, [attendanceList, selectedMonth, selectedYear]);
 
   useEffect(() => {
     if (attendanceList) {
@@ -70,73 +191,106 @@ function AttendanceGrid({ attendanceList, selectedMonth, selectedYear }) {
         (record) => record.year === selectedYear
       );
       const userList = getUniqueRecord(filteredList);
-      setRowData(userList);
 
-      const DayColumns = dayArray.flatMap((date) => {
-        const dayEditable = isDayEditable(date);
-        return {
-          headerName: `${getDayWithSuffix(date)} ${moment(selectedMonth).format(
-            "MMM"
-          )}`,
-          marryChildren: true,
-          children: [
-            {
-              headerName: `Morning`,
-              field: `day${date}-1`,
-              editable: dayEditable,
-              cellRenderer: CheckboxRenderer,
-              cellStyle: (params) => ({
-                textAlign: "center",
-              }),
-              width: 100,
-              cellRendererParams: { dayEditable },
-            },
-            {
-              headerName: `Midday`,
-              field: `day${date}-2`,
-              editable: dayEditable,
-              cellRenderer: CheckboxRenderer,
-              cellStyle: (params) => ({
-                textAlign: "center",
-              }),
-              width: 100,
-              cellRendererParams: { dayEditable },
-            },
-            {
-              headerName: `Afternoon`,
-              field: `day${date}-3`,
-              editable: dayEditable,
-              cellRenderer: CheckboxRenderer,
-              cellStyle: (params) => ({
-                textAlign: "center",
-              }),
-              width: 100,
-              cellRendererParams: { dayEditable },
-            },
-          ],
-        };
-      });
+      // Ensure totalHours is defined in the correct scope
+      const semesterStart = `${moment().year()}-01-01`; // Adjust if needed
+      const today = moment();
+      const totalDays = today.diff(moment(semesterStart), "days") + 1;
+      const totalHours = totalDays * 3; // Since each day has 3 sections
 
-      // Used for checking if the student is present or not
-      dayArray.forEach((date) => {
-        userList.forEach((obj) => {
-          obj[`day${date}-1`] = isAbsent1(obj.Rollno, date);
-          obj[`day${date}-2`] = isAbsent2(obj.Rollno, date);
-          obj[`day${date}-3`] = isAbsent3(obj.Rollno, date);
+      if (userList.length === 0) {
+        setRowData([]);
+      } else {
+        const updatedUserList = userList.map((student) => {
+          let absentCount = 0;
+          attendanceList.forEach((record) => {
+            if (record.Rollno === student.Rollno) {
+              if (record.absent1) absentCount++;
+              if (record.absent2) absentCount++;
+              if (record.absent3) absentCount++;
+            }
+          });
+
+          dayArray.forEach((date) => {
+            if (isAbsent1(student.Rollno, date)) absentCount++;
+            if (isAbsent2(student.Rollno, date)) absentCount++;
+            if (isAbsent3(student.Rollno, date)) absentCount++;
+
+            student[`day${date}-1`] = isAbsent1(student.Rollno, date) || false;
+            student[`day${date}-2`] = isAbsent2(student.Rollno, date) || false;
+            student[`day${date}-3`] = isAbsent3(student.Rollno, date) || false;
+          });
+
+          return {
+            ...student,
+            absentHours: absentCount,
+            presentHours: totalHours - absentCount,
+            attendancePercentage: (
+              ((totalHours - absentCount) / totalHours) *
+              100
+            ).toFixed(2),
+          };
         });
-      });
+
+        setRowData(updatedUserList);
+      }
 
       setColDef(() => [
-        {
-          field: "Rollno",
-          pinned: "left",
-        },
+        { field: "Rollno", pinned: "left" },
         { field: "name", pinned: "left" },
-        ...DayColumns,
+        {
+          headerName: "Total Hours",
+          field: "totalHours",
+          valueGetter: () => totalHours, // Now correctly defined
+          width: 120,
+        },
+        { headerName: "Present Hours", field: "presentHours", width: 120 },
+        {
+          headerName: "Attendance (%)",
+          field: "attendancePercentage",
+          width: 120,
+        },
+        ...dayArray.flatMap((date) => {
+          const dayEditable = isDayEditable(date);
+          return {
+            headerName: `${getDayWithSuffix(date)} ${moment(
+              selectedMonth
+            ).format("MMM")}`,
+            marryChildren: true,
+            children: [
+              {
+                headerName: "Morning",
+                field: `day${date}-1`,
+                editable: dayEditable,
+                cellRenderer: CheckboxRenderer,
+                cellStyle: { textAlign: "center" },
+                width: 100,
+                cellRendererParams: { dayEditable },
+              },
+              {
+                headerName: "Midday",
+                field: `day${date}-2`,
+                editable: dayEditable,
+                cellRenderer: CheckboxRenderer,
+                cellStyle: { textAlign: "center" },
+                width: 100,
+                cellRendererParams: { dayEditable },
+              },
+              {
+                headerName: "Afternoon",
+                field: `day${date}-3`,
+                editable: dayEditable,
+                cellRenderer: CheckboxRenderer,
+                cellStyle: { textAlign: "center" },
+                width: 100,
+                cellRendererParams: { dayEditable },
+              },
+            ],
+          };
+        }),
       ]);
-      //deleteFalseRecords();
     }
-  }, [attendanceList]);
+  }, [attendanceList, selectedMonth, selectedYear]);
 
   const isAbsent1 = (Rollno, day) => {
     const result = attendanceList.find(
@@ -161,6 +315,9 @@ function AttendanceGrid({ attendanceList, selectedMonth, selectedYear }) {
   const getUniqueRecord = (filteredAttendanceList) => {
     const uniqueRecord = [];
     const existingRecord = new Set();
+    const filteredStudentList = studentList.filter(
+      (record) => record.year === selectedYear
+    );
 
     filteredAttendanceList.forEach((record) => {
       if (!existingRecord.has(record.Rollno)) {
@@ -169,6 +326,25 @@ function AttendanceGrid({ attendanceList, selectedMonth, selectedYear }) {
       }
     });
 
+    if (uniqueRecord.length === 0) {
+      filteredStudentList.forEach((record) => {
+        uniqueRecord.push({
+          Rollno: record.rollno,
+          name: record.name,
+          absent1: false,
+          absent2: false,
+          absent3: false,
+          // Add empty days dynamically
+          ...Object.fromEntries(
+            dayArray.flatMap((date) => [
+              [`day${date}-1`, false],
+              [`day${date}-2`, false],
+              [`day${date}-3`, false],
+            ])
+          ),
+        });
+      });
+    }
     return uniqueRecord;
   };
 
