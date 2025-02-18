@@ -15,6 +15,7 @@ function AttendanceGrid({
   const [rowData, setRowData] = useState([]);
   const [colDef, setColDef] = useState([]);
 
+  // Function to get the number of days in a given month and year
   const DaysofMonth = (year, month) => new Date(year, month, 0).getDate();
   const numberOfDays = DaysofMonth(
     moment(selectedMonth).format("yyyy"),
@@ -22,6 +23,7 @@ function AttendanceGrid({
   );
   const dayArray = Array.from({ length: numberOfDays }, (_, i) => i + 1);
 
+  // Function to format day with suffix (st, nd, rd, th)
   const getDayWithSuffix = (day) => {
     const j = day % 10;
     const k = day % 100;
@@ -37,37 +39,12 @@ function AttendanceGrid({
     return `${day}th`;
   };
 
+  // Function to check if a day is editable (future or present date)
   const isDayEditable = (day) => {
     const today = moment();
     const cellDate = moment(selectedMonth).date(day);
     return cellDate.isSameOrAfter(today, "day");
   };
-
-  // const deleteFalseRecords = () => {
-  //   attendanceList.forEach((record) => {
-  //     const isFalse =
-  //       record.absent1 == false &&
-  //       record.absent2 == false &&
-  //       record.absent3 == false;
-
-  //     if (isFalse) {
-  //       GlobalApi.deleteAttendanceRecord({
-  //         Rollno: record.Rollno,
-  //         date: record.date,
-  //         day: record.day,
-  //       })
-  //         .then((resp) => {
-  //           console.log(`Record for Rollno ${record.Rollno} deleted`, resp);
-  //         })
-  //         .catch((err) => {
-  //           console.error(
-  //             `Failed to delete record for Rollno ${record.Rollno}`,
-  //             err
-  //           );
-  //         });
-  //     }
-  //   });
-  // };
 
   useEffect(() => {
     if (attendanceList) {
@@ -76,11 +53,11 @@ function AttendanceGrid({
       );
       const userList = getUniqueRecord(filteredList);
 
-      // Ensure totalHours is defined in the correct scope
+      // Calculate total hours (assuming each day has 3 sections)
       const semesterStart = `${moment().year()}-01-01`; // Adjust if needed
       const today = moment();
       const totalDays = today.diff(moment(semesterStart), "days") + 1;
-      const totalHours = totalDays * 3; // Since each day has 3 sections
+      const totalHours = totalDays * 3;
 
       if (userList.length === 0) {
         setRowData([]);
@@ -119,13 +96,14 @@ function AttendanceGrid({
         setRowData(updatedUserList);
       }
 
+      // Define column definitions
       setColDef(() => [
         { field: "Rollno", pinned: "left" },
         { field: "name", pinned: "left" },
         {
           headerName: "Total Hours",
           field: "totalHours",
-          valueGetter: () => totalHours, // Now correctly defined
+          valueGetter: () => totalHours,
           width: 120,
         },
         { headerName: "Present Hours", field: "presentHours", width: 120 },
@@ -176,62 +154,7 @@ function AttendanceGrid({
     }
   }, [attendanceList, selectedMonth, selectedYear]);
 
-  const isAbsent1 = (Rollno, day) => {
-    const result = attendanceList.find(
-      (item) => item.day == day && item.Rollno == Rollno && item.absent1 == true
-    );
-    return result ? true : false;
-  };
-  const isAbsent2 = (Rollno, day) => {
-    const result = attendanceList.find(
-      (item) => item.day == day && item.Rollno == Rollno && item.absent2 == true
-    );
-    return result ? true : false;
-  };
-  const isAbsent3 = (Rollno, day) => {
-    const result = attendanceList.find(
-      (item) => item.day == day && item.Rollno == Rollno && item.absent3 == true
-    );
-    return result ? true : false;
-  };
-
-  //Used to return the unique record in the attendance list
-  const getUniqueRecord = (filteredAttendanceList) => {
-    const uniqueRecord = [];
-    const existingRecord = new Set();
-    const filteredStudentList = studentList.filter(
-      (record) => record.year === selectedYear
-    );
-
-    filteredAttendanceList.forEach((record) => {
-      if (!existingRecord.has(record.Rollno)) {
-        existingRecord.add(record.Rollno);
-        uniqueRecord.push(record);
-      }
-    });
-
-    if (uniqueRecord.length === 0) {
-      filteredStudentList.forEach((record) => {
-        uniqueRecord.push({
-          Rollno: record.rollno,
-          name: record.name,
-          absent1: false,
-          absent2: false,
-          absent3: false,
-          // Add empty days dynamically
-          ...Object.fromEntries(
-            dayArray.flatMap((date) => [
-              [`day${date}-1`, false],
-              [`day${date}-2`, false],
-              [`day${date}-3`, false],
-            ])
-          ),
-        });
-      });
-    }
-    return uniqueRecord;
-  };
-
+  // Checkbox renderer for attendance marking
   const CheckboxRenderer = (props) => {
     const { value } = props;
     const { dayEditable } = props.colDef.cellRendererParams || {};
@@ -253,37 +176,6 @@ function AttendanceGrid({
         }}
       />
     );
-  };
-
-  const markAttendance = (daySection, Rollno, absentStatus) => {
-    const date = moment(selectedMonth).format("MM/yyyy");
-    const day = parseInt(daySection.match(/day(\d+)-\d/)[1]);
-
-    if (!isDayEditable(day)) {
-      toast.error("Attendance for this day is locked and cannot be changed.");
-      return;
-    }
-
-    const data = {
-      Rollno: Rollno,
-      date: date,
-      day: day,
-    };
-
-    if (daySection.endsWith("-1")) {
-      data.absent1 = absentStatus;
-    } else if (daySection.endsWith("-2")) {
-      data.absent2 = absentStatus;
-    } else if (daySection.endsWith("-3")) {
-      data.absent3 = absentStatus;
-    }
-
-    GlobalApi.markAttendance(data).then((resp) => {
-      console.log(resp);
-      toast(
-        absentStatus ? "Student Marked as Absent" : "Student Marked as Present"
-      );
-    });
   };
 
   return (

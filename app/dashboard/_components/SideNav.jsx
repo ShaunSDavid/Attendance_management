@@ -1,5 +1,6 @@
+// SideNav.jsx - Sidebar Navigation for Teacher Dashboard
+
 "use client";
-// import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import { GraduationCap, Hand, LayoutIcon, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,38 +8,28 @@ import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 function SideNav() {
-  // const { user } = useKindeBrowserClient();
+  // State to manage loading state for logout
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  // List of navigation menu items
   const menuList = [
-    {
-      id: 1,
-      name: "DashBoard",
-      icon: LayoutIcon,
-      path: "/dashboard",
-    },
+    { id: 1, name: "DashBoard", icon: LayoutIcon, path: "/dashboard" },
     {
       id: 2,
       name: "Students",
       icon: GraduationCap,
       path: "/dashboard/students",
     },
-    {
-      id: 3,
-      name: "Attendance",
-      icon: Hand,
-      path: "/dashboard/attendance",
-    },
-    {
-      id: 4,
-      name: "Settings",
-      icon: Settings,
-      path: "/dashboard/settings",
-    },
+    { id: 3, name: "Attendance", icon: Hand, path: "/dashboard/attendance" },
+    { id: 4, name: "Settings", icon: Settings, path: "/dashboard/settings" },
   ];
 
+  // Get current path for highlighting active menu
   const path = usePathname();
   useEffect(() => console.log(path), [path]);
+
+  // Handle user logout
   const handlelogout = () => {
     setLoading(true);
     document.cookie =
@@ -49,6 +40,7 @@ function SideNav() {
 
   return (
     <div className="border shadow-md h-screen p-4">
+      {/* Logo */}
       <Image
         src="/licet.png"
         width={180}
@@ -56,14 +48,14 @@ function SideNav() {
         alt="logo"
         className="ml-5"
       />
+      <hr className="my-5" />
 
-      <hr className="my-5"></hr>
-
-      {menuList.map((menu, index) => (
-        <Link href={menu.path}>
+      {/* Navigation Menu */}
+      {menuList.map((menu) => (
+        <Link href={menu.path} key={menu.id}>
           <h2
             className={`flex gap-4 items-center text-md p-4 text-slate-500 hover:bg-primary hover:text-white cursor-pointer rounded-lg my-2 ${
-              path == menu.path && "bg-primary text-white"
+              path === menu.path && "bg-primary text-white"
             }`}
           >
             <menu.icon />
@@ -71,6 +63,8 @@ function SideNav() {
           </h2>
         </Link>
       ))}
+
+      {/* Logout Button */}
       <div className="flex gap-1.5 bottom-5 items-center fixed">
         <button
           type="submit"
@@ -81,21 +75,6 @@ function SideNav() {
           {loading ? "Logging out..." : "Logout"}
         </button>
       </div>
-      {/* <div className="flex gap-1.5 bottom-5 items-center fixed">
-        <Image
-          src={user?.picture}
-          width={35}
-          height={35}
-          alt="user"
-          className="rounded-full"
-        />
-        <div>
-          <h2 className="text-sm font-bold">
-            {user?.given_name} {user?.family_name}
-          </h2>
-          <h2 className="text-xs">{user?.email}</h2>
-        </div>
-      </div> */}
     </div>
   );
 }
